@@ -7,8 +7,8 @@ from datetime import datetime
 BASE_PATH = "/Users/2na/Documents/binge"
 INPUT_DIR = "organized_data"
 TITLES_FILE = os.path.join(BASE_PATH, "movie_titles.csv")
-INPUT_FILE = os.path.join(INPUT_DIR, "customer_avg_ratings.csv")
-OUTPUT_FILE = os.path.join(INPUT_DIR, "customer_avg_ratings_v2.csv")
+INPUT_FILE = os.path.join(INPUT_DIR, "movie_avg_ratings.csv")
+OUTPUT_FILE = os.path.join(INPUT_DIR, "movie_avg_ratings_v2.csv")
 
 # Klasör kontrolü ve oluşturma
 def ensure_directory_exists(directory: str):
@@ -38,7 +38,7 @@ def calculate_year_diff(min_date, year):
         return 0
 
 # CSV formatında veriyi güncelleme
-def process_customer_data(input_file, output_file, movie_years):
+def process_movie_data(input_file, output_file, movie_years):
     with open(input_file, "r", encoding="utf-8") as infile, open(output_file, "w", newline="", encoding="utf-8") as outfile:
         reader = csv.reader(infile)
         writer = csv.writer(outfile)
@@ -56,7 +56,7 @@ def process_customer_data(input_file, output_file, movie_years):
 def main():
     ensure_directory_exists(INPUT_DIR)
     movie_years = load_movie_years(TITLES_FILE)
-    process_customer_data(INPUT_FILE, OUTPUT_FILE, movie_years)
+    process_movie_data(INPUT_FILE, OUTPUT_FILE, movie_years)
     print(f"Yeni dosya oluşturuldu: {OUTPUT_FILE}")
 
 if __name__ == "__main__":
