@@ -1,156 +1,174 @@
 from typing import Dict, List, Tuple
+from collections import defaultdict
+from datetime import datetime, time
 import csv
-from datetime import datetime
 
+class Recommendation_movie:
+    def __init__(self):
+        self.file_paths =["D:/indirilenler/binge/rating_1.txt","D:/indirilenler/binge/rating_2.txt","D:/indirilenler/binge/rating_3.txt","D:/indirilenler/binge/rating_4.txt"]
+        self.csv_path = "D:/indirilenler/binge/movie_titles.csv"
 
-file_path = "D:/indirilenler/binge/rating_1.txt"
+        self.film_ratings_cache = None
+        self.user_ids_cache = None
 
+        self.film_ratings_cache, self.user_ids_cache = self.read_txt()
+        self.movie_dict = self.read_csv()
+        self.avg_ratings = self.calculate_avg_ratings(self.film_ratings_cache)
+        self.avg_rating_by_year = self.calculate_avg_ratings_by_year()
+        self.top_movies = self.sort_by_ratings(self.avg_ratings)
+        self.user_list = list(self.user_ids_cache.keys())
 
-def read_txt():
-    film_ratings: Dict[int, List[Tuple[int, str, int]]] = {}
-    user_ids: Dict[int, List[Tuple[int,int]] ] = {}
-    with open(file_path, "r") as file:
+    # start_time = datetime.now()
+    def read_txt(self):
+        film_ratings: Dict[int, List[Tuple[int, str, int]]] = defaultdict(list)
+        user_ids: Dict[int, List[Tuple[int,int]] ] = defaultdict(list)
+        for file_path in self.file_paths:
+            with open(file_path, "r") as file:
 
-        for i, line in enumerate(file):
-            if i>5000:
-                break
-          
-            c = line.strip().split(",")
+                for i ,line in enumerate(file):
             
-            movie_id =int(c[0])
-            user_id= int(c[1])
-            date= c[2]
-            rating= float(c[3])
-
-            if movie_id not in film_ratings:
-                film_ratings[movie_id] = []
-
-            if user_id not in user_ids:
-                user_ids[user_id] = []
-
-            film_ratings[movie_id].append((user_id, date, rating))
-            user_ids[user_id].append((movie_id,  rating))
-
-        return film_ratings, user_ids
-
-csv_path = "D:/indirilenler/binge/movie_titles.csv"
-
-def read_csv():
-    movies = {}
-    with open(csv_path, "r") as csv_file:
-        csv_reader = csv.reader(csv_file) #keep the memory
-        # csv_reader = csv.DictReader(csv_file) dict olarak tutar ilk columnu belirteç olarak alır
-
-
-        for line in csv_reader: 
-            movie_id = int(line[0])
-            movies[movie_id] = {
-                'published_year': line[1] , 
-                'movie_name': line[2]
-                }
-
-        return movies
-
+                    movie_id, user_id, date, rating = line.strip().split(",")
                     
-ratings, user_ids = read_txt()
-# print(user_ids)
- 
-film_ratings_cache = None
-user_ids_cache = None
+                    movie_id =int(movie_id)
+                    user_id= int(user_id)
+                    rating= float(rating)
 
-def read_txt_cached():
-    global film_ratings_cache, user_ids_cache
-    if film_ratings_cache is None or user_ids_cache is None:
-        film_ratings_cache, user_ids_cache = read_txt()
-    return film_ratings_cache, user_ids_cache
+                    film_ratings[movie_id].append((user_id, date, rating))
+                    user_ids[user_id].append((movie_id,  rating))
 
-# İlk çağrıda dosyadan okuyacak, sonrasında bellekte tutacak
-ratings, user_ids = read_txt_cached()
+            return dict(film_ratings), dict(user_ids)
 
 
-def avg_rating(ratings: Dict[int, List[Tuple[int, str, float]]]) -> Dict[int,float]:
-    movie_avg_Rate= {}
 
-    for movie_id, movie_ratings in ratings.items():
-
-        ratings_list = [rating for (_,_,rating) in movie_ratings]
-        avg_rate = sum(ratings_list) / len(ratings_list)
-        movie_avg_Rate[movie_id] = avg_rate
-
-    return movie_avg_Rate
-
-avg= avg_rating(ratings)
-sorteds =sorted(avg.items(), key=lambda item: item[1], reverse=True)
-# print(sorteds[0][0])
-
-user_id_list = [1,2,3]
-top_5_movies = sorteds[:5]
-#user id listesi oluştur
-def cold_start(user_id):
-    movie_dict = read_csv()
-    if user_id not in user_id_list:
-        print(f"Welcome {user_id}! Here are the top 5 movies for your fresh start:")
-        for i,(movie_id, rating) in enumerate(top_5_movies):
-            movie_name = movie_dict[movie_id]["movie_name"]
-            print(f"{i+1}-) {movie_name},  Rate: {rating:.2f}")
-    else:
-        print(f"User {user_id} is already registered. No cold start recommendations needed.")
-
-# cold_startt = cold_start(2)
+    def read_csv(self):
+        movies = {}
+        with open(self.csv_path, "r") as csv_file:
+            csv_reader = csv.reader(csv_file) #keep the memory
+            # csv_reader = csv.DictReader(csv_file) dict olarak tutar ilk columnu belirteç olarak alır
 
 
-def our_customer(user_id):
-    rated_movies = []
-    movie_dict = read_csv()
+            for line in csv_reader: 
+                movie_id = int(line[0])
+
+                published_year = line[1] if line[1] != 'NULL' else '2000'
+                    
+                movies[movie_id] = {
+                    'published_year': line[1] , 
+                    'movie_name': line[2]
+                    }
+
+            
+
+            return movies
+        # end_time = datetime.now()
     
-    # Kullanıcıya ait tüm verileri al
-    if user_id in user_ids:
-        print(f"hey you are.. it is good to see you again. what do you want to watch? these your movies that watched and rated. you can chose like them")
-        for movie_id, rating in user_ids[user_id]:
-            movie_name = movie_dict[movie_id]["movie_name"]
+    def calculate_avg_ratings(self, ratings: Dict[int, List[Tuple[int, str, float]]]) -> Dict[int,float]:
+        movie_avg_Rate= {}
 
-            rated_movies.append((movie_name, rating))
-    
-    return rated_movies
-       
+        for movie_id, movie_ratings in self.film_ratings_cache.items():
 
-customer = our_customer(387418)
-print(customer)
+            ratings_list = [rating for (_,_,rating) in movie_ratings]
+            avg_rate = sum(ratings_list) / len(ratings_list)
+            movie_avg_Rate[movie_id] = avg_rate
 
-# def compare_movies(movie_id, movie_id2):
+        return movie_avg_Rate
 
-# def count_rated_movies(user_ids):
-#     # Kullanıcılar ve puanladıkları film sayısını tutacak bir liste
-#     user_ratings_count = {}
+    def calculate_avg_ratings_by_year(self) -> Dict[str, List[Dict]]:
+        movie_rate_by_year = {}
 
-#     for user_id, ratings in user_ids.items():
-#         # Kullanıcının puanladığı film sayısı
-#         rated_movies_count = len(ratings)
-#         user_ratings_count[user_id] = rated_movies_count
+        for movie_id, movie_info in self.movie_dict.items():
+            year = movie_info['published_year']
+            movie_name = movie_info['movie_name']
+            
+            # Check if the movie has ratings
+            if movie_id in self.film_ratings_cache:
+                movie_ratings = self.film_ratings_cache[movie_id]
+                ratings_list = [rating for (_, _, rating) in movie_ratings]
+                avg_rate = sum(ratings_list) / len(ratings_list)
 
-#     # Kullanıcıları, puanladıkları film sayısına göre azalan sırayla sıralama
-#     sorted_user_ratings = sorted(user_ratings_count.items(), key=lambda x: x[1])
+                # Group movies by year
+                if year not in movie_rate_by_year:
+                    movie_rate_by_year[year] = []
+                movie_rate_by_year[year].append({
+                    "movie_name": movie_name,
+                    "rate": avg_rate,
+                    "movie_id": movie_id
+                })
 
-#     return sorted_user_ratings
+        return movie_rate_by_year  
 
-# # Kullanıcıların puanladığı film sayısını alıp sıralama
-# sorted_user_ratings = count_rated_movies(user_ids)
+    def sort_by_ratings(self, ratings) -> List[Tuple[int,float]]:
+        return sorted(self.avg_ratings.items(), key=lambda item: item[1], reverse=True)
 
-# # Sonuçları yazdırma
-# for user_id, count in sorted_user_ratings:
-#     print(f"Kullanıcı ID: {user_id}, Puanladığı Film Sayısı: {count}")
+    def cold_start(self, user_id):
+        if user_id not in self.user_list:
+            print(f"Welcome {user_id}! Here are the top 5 movies for your fresh start:")
+            for i,(movie_id, rating) in enumerate(self.top_movies[:5]):
+                movie_name = self.movie_dict[movie_id]["movie_name"]
+                print(f"{i+1}-) {movie_name},  Rate: {rating:.2f}")
+        else:
+            print(f"User {user_id} is already registered. No cold start recommendations needed.")
 
-    
+    # #count of review ekle her bir film için
 
-# print(avg)
-# ratings = film_ratings[1][1][2]
-# print(len(film_ratings))
-    # print(type(content))  #list
-    # print(len(content))
+    def our_customer(self, user_id):
+        rated_movies = {}
+        published_years = []
+   
+        if user_id in self.user_ids_cache:
+            print(f"hey you are.. it is good to see you again. what do you want to watch? these your movies that watched and rated. you can chose like them")
+            for movie_id, rating in self.user_ids_cache[user_id]:
+                movie_name = self.movie_dict[movie_id]["movie_name"]
+                published_year = self.movie_dict[movie_id]["published_year"]
+                movie_info = self.movie_dict[movie_id]
+
+                rated_movies[movie_id] = { "name": movie_name, "rating": rating, "published_year": published_year}
+                # rated_movies.append((movie_name, rating))
+                if str(published_year).isdigit():  
+                    published_years.append(int(published_year))
+
+            top_rated_movies = sorted(
+                rated_movies.items(), 
+                key=lambda x: x[1]["rating"], 
+                reverse=True
+            )[:5]
+
+            print("\nYour top rated movies:")
+            for movie_id, info in top_rated_movies:
+                print(f"- {info['name']} ({info['published_year']}) - Your rating: {info['rating']}")
+
+            
+            recommendations = []
+            for year in published_years:
+                if str(year) in self.avg_rating_by_year:  # Yıl string olarak tutuluyor
+                    for movie in self.avg_rating_by_year[str(year)]:
+                        recommendations.append(movie["movie_name"])
+
+            print(f"\nHere are your recommendations: {recommendations[:5]}")
+
+            
+    def compare_movies(self,movie_id, movie_id2):
+        now = datetime.now().year
+
+        movie_1 = self.movie_dict[movie_id]
+        movie_2 = self.movie_dict[movie_id2]
+        print(f"Compare {movie_1} and {movie_2} ")
+
+        if(self.avg_ratings[movie_id] < self.avg_ratings[movie_id2]):
+            print(f"{movie_1["movie_name"]} rate is less than {movie_2["movie_name"]}")
+        else:
+            print(f"{self.movie_dict[movie_id2]["movie_name"]} rate is less than {self.movie_dict[movie_id]["movie_name"]}")
+
+        age1 = now - int(movie_1["published_year"])
+        age2 = now - int(movie_2["published_year"])
+
+        print(f"lets look the age of movies. \n{movie_1["movie_name"]}: {age1} \n{movie_2["movie_name"]} is published: {age2}")
 
 
+recommender = Recommendation_movie()
 
-#oku ve movie idye göre dicte kaydet
-#movie idye göre avarage rate skoru döndür her biri için ve bunları ayrı bir yerde tut ve büyüükten küçüğe sırala
+recommendations = recommender.cold_start(2)
 
+compare = recommender.compare_movies(1,2)
 
+our_customer = recommender.our_customer(387418)
