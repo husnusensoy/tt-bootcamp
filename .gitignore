@@ -2,3 +2,5 @@ data/
 uv.lock
 mapred/dfs
 __pycache__/
+.DS_Store
+.tmp/
