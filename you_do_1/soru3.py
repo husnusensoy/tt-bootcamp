@@ -22,8 +22,8 @@ def calculate_weighted_score(movie):
     watch_count = movie['Watch_Count']
     avg_rating = movie['Avg_Rating']
     
-    # Quantile ağırlıkları (üst quantile'lara daha fazla önem veriyoruz)
-    quantile_weights = {1: 0.5, 2: 0.75, 3: 1.0, 4: 1.25, 5: 1.5}
+    # Quantile ağırlıkları (düşük quantile'lara daha fazla önem veriyoruz)
+    quantile_weights = {1: 1.5, 2: 1.25, 3: 1.0, 4: 0.75, 5: 0.5}
     
     # Ağırlıklı frekans hesaplama
     weighted_freq = 0
