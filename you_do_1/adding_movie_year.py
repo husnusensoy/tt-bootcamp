@@ -5,7 +5,7 @@ from datetime import datetime
 
 # Veri yolu tanımı
 BASE_PATH = "/Users/2na/Documents/binge"
-INPUT_DIR = "organized_data"
+INPUT_DIR = "you_do_1/organized_data"
 TITLES_FILE = os.path.join(BASE_PATH, "movie_titles.csv")
 INPUT_FILE = os.path.join(INPUT_DIR, "movie_avg_ratings.csv")
 OUTPUT_FILE = os.path.join(INPUT_DIR, "movie_avg_ratings_v2.csv")
