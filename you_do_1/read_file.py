@@ -13,7 +13,7 @@ class Recommendation_movie:
 
         self.film_ratings_cache, self.user_ids_cache = self.read_txt()
         self.movie_dict = self.read_csv()
-        self.avg_ratings = self.calculate_avg_ratings(self.film_ratings_cache)
+        self.avg_ratings, self.total = self.calculate_avg_ratings()
         self.avg_rating_by_year = self.calculate_avg_ratings_by_year()
         self.top_movies = self.sort_by_ratings(self.avg_ratings)
         self.user_list = list(self.user_ids_cache.keys())
@@ -26,7 +26,11 @@ class Recommendation_movie:
             with open(file_path, "r") as file:
 
                 for i ,line in enumerate(file):
-            
+
+                    # if i >500000:
+                    #     break
+
+                  
                     movie_id, user_id, date, rating = line.strip().split(",")
                     
                     movie_id =int(movie_id)
@@ -36,7 +40,7 @@ class Recommendation_movie:
                     film_ratings[movie_id].append((user_id, date, rating))
                     user_ids[user_id].append((movie_id,  rating))
 
-            return dict(film_ratings), dict(user_ids)
+        return dict(film_ratings), dict(user_ids)
 
 
 
@@ -45,7 +49,6 @@ class Recommendation_movie:
         with open(self.csv_path, "r") as csv_file:
             csv_reader = csv.reader(csv_file) #keep the memory
             # csv_reader = csv.DictReader(csv_file) dict olarak tutar ilk columnu belirteç olarak alır
-
 
             for line in csv_reader: 
                 movie_id = int(line[0])
@@ -62,16 +65,38 @@ class Recommendation_movie:
             return movies
         # end_time = datetime.now()
     
-    def calculate_avg_ratings(self, ratings: Dict[int, List[Tuple[int, str, float]]]) -> Dict[int,float]:
-        movie_avg_Rate= {}
+    def calculate_avg_ratings(self) -> Dict[int,float]:
 
-        for movie_id, movie_ratings in self.film_ratings_cache.items():
+        length = {}
+    #her film kaç kez oylanmış ona baktık
+        for i in self.film_ratings_cache:
+            values = self.film_ratings_cache[i]
+            ratings = [entry[2] for entry in values]
+            avg_rate = sum(ratings)/ len(ratings)
 
-            ratings_list = [rating for (_,_,rating) in movie_ratings]
-            avg_rate = sum(ratings_list) / len(ratings_list)
-            movie_avg_Rate[movie_id] = avg_rate
+            length[i] = {"avg_rate": avg_rate, "izlenme":len(values)}
 
-        return movie_avg_Rate
+        weighted_scores = {}
+
+        for movie_id, data in length.items():
+            avg_rate = data["avg_rate"]
+            vote_count = data["izlenme"]
+
+     
+            weighted_score = avg_rate * vote_count  
+
+            weighted_scores[movie_id] = {
+                "weighted_score": weighted_score,
+                "avg_rate": avg_rate,
+                "izlenme": vote_count
+            }
+
+        total_weighted_sum = sum([score["weighted_score"] for score in weighted_scores.values()])
+        total_votes = sum([score["izlenme"] for score in weighted_scores.values()])
+
+        final_weighted_average = total_weighted_sum / total_votes if total_votes > 0 else 0
+
+        return weighted_scores, final_weighted_average
 
     def calculate_avg_ratings_by_year(self) -> Dict[str, List[Dict]]:
         movie_rate_by_year = {}
@@ -80,13 +105,12 @@ class Recommendation_movie:
             year = movie_info['published_year']
             movie_name = movie_info['movie_name']
             
-            # Check if the movie has ratings
             if movie_id in self.film_ratings_cache:
                 movie_ratings = self.film_ratings_cache[movie_id]
                 ratings_list = [rating for (_, _, rating) in movie_ratings]
                 avg_rate = sum(ratings_list) / len(ratings_list)
 
-                # Group movies by year
+            
                 if year not in movie_rate_by_year:
                     movie_rate_by_year[year] = []
                 movie_rate_by_year[year].append({
@@ -97,19 +121,22 @@ class Recommendation_movie:
 
         return movie_rate_by_year  
 
-    def sort_by_ratings(self, ratings) -> List[Tuple[int,float]]:
-        return sorted(self.avg_ratings.items(), key=lambda item: item[1], reverse=True)
+    def sort_by_ratings(self, weighted_scores) -> List[Tuple[int,float]]:
+        return sorted(weighted_scores.items(), key=lambda item: item[1]['weighted_score'], reverse=True)
 
     def cold_start(self, user_id):
         if user_id not in self.user_list:
             print(f"Welcome {user_id}! Here are the top 5 movies for your fresh start:")
-            for i,(movie_id, rating) in enumerate(self.top_movies[:5]):
+
+            top_5_movies = self.top_movies[:5]
+
+            for i, (movie_id, data) in enumerate(top_5_movies):
                 movie_name = self.movie_dict[movie_id]["movie_name"]
-                print(f"{i+1}-) {movie_name},  Rate: {rating:.2f}")
+                rating = data['weighted_score']  # Veya weighted_score kullanabilirsiniz.
+                print(f"{i+1}-) {movie_name}, Rate: {rating:.2f}")
         else:
             print(f"User {user_id} is already registered. No cold start recommendations needed.")
 
-    # #count of review ekle her bir film için
 
     def our_customer(self, user_id):
         rated_movies = {}
@@ -154,7 +181,7 @@ class Recommendation_movie:
         movie_2 = self.movie_dict[movie_id2]
         print(f"Compare {movie_1} and {movie_2} ")
 
-        if(self.avg_ratings[movie_id] < self.avg_ratings[movie_id2]):
+        if(self.avg_ratings[movie_id]["weighted_score"] < self.avg_ratings[movie_id2]["weighted_score"]):
             print(f"{movie_1["movie_name"]} rate is less than {movie_2["movie_name"]}")
         else:
             print(f"{self.movie_dict[movie_id2]["movie_name"]} rate is less than {self.movie_dict[movie_id]["movie_name"]}")
@@ -166,6 +193,9 @@ class Recommendation_movie:
 
 
 recommender = Recommendation_movie()
+
+# avg = recommender.calculate_avg_ratings()
+# print(avg)
 
 recommendations = recommender.cold_start(2)
 

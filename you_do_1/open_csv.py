@@ -3,6 +3,8 @@ from dataclasses import dataclass
 from typing import List, Dict, Tuple
 from collections import defaultdict
 
+from pprint import pprint
+
 
 @dataclass
 class Movies:
@@ -16,10 +18,7 @@ class Ratings:
     created_date: int
     rate: int
 
-def read_txt(file_name: List[str], delimiter: str = ","):
-    ratings_dict: Dict[int, ratings]
 
-    
 
 def read_file(file_name: str | Path,header:bool, delimiter: str = ","):
     movie_dict: Dict[int, Movies] = {}
@@ -67,8 +66,7 @@ def read_txt():
             with open(file_path, "r") as file:
 
                 for i ,line in enumerate(file):
-
-                    if i>20000:
+                    if i>500000:
                         break
             
                     movie_id, user_id, date, rating = line.strip().split(",")
@@ -82,26 +80,72 @@ def read_txt():
 
         return dict(film_ratings), dict(user_ids)
 
-def calculate_avg_ratings(ratings):
-        movie_avg_Rate= {}
-        watcher_count = {}
-        for movie_id, movie_ratings in ratings.items():
+def calculate(txt):
+    length = {}
+    #her film kaç kez oylanmış ona baktık
+    for i in txt:
+       values = txt[i]
+       ratings = [entry[2] for entry in values]
+       avg_rate = sum(ratings)/ len(ratings)
 
-            ratings_list = [rating for (_,_,rating) in movie_ratings]
-            avg_rate = sum(ratings_list) / len(ratings_list)
-            movie_avg_Rate[movie_id] = avg_rate
+       length[i] = {"avg_rate": avg_rate, "izlenme":len(values)}
 
-            watcher_count[movie_id] = {"izlenme": len(ratings_list), "rate": avg_rate}
+    weighted_scores = {}
 
-        return watcher_count
+    for movie_id, data in length.items():
+        avg_rate = data["avg_rate"]
+        vote_count = data["izlenme"]
+
+        # Ağırlıklı Ortalama Hesaplama
+        weighted_score = avg_rate * vote_count  # Puan * Oylama sayısı
+
+        weighted_scores[movie_id] = {
+            "weighted_score": weighted_score,
+            "avg_rate": avg_rate,
+            "izlenme": vote_count
+        }
+
+    # Ağırlıklı ortalamayı toplam oylama sayısına böleriz
+    total_weighted_sum = sum([score["weighted_score"] for score in weighted_scores.values()])
+    total_votes = sum([score["izlenme"] for score in weighted_scores.values()])
+
+    final_weighted_average = total_weighted_sum / total_votes if total_votes > 0 else 0
+
+    return final_weighted_average, weighted_scores
+
+    # sorted_length = dict(sorted(length.items(), key=lambda item: item[1]['avg_rate'], reverse=True))
+    # return(sorted_length)
+
+def sort_by_ratings(weighted_scores):
+    # "weighted_scores" sözlüğünü "weighted_score" değerine göre azalan sırayla sıralar
+    return sorted(weighted_scores.items(), key=lambda item: item[1]['weighted_score'], reverse=True)
+
+# Örnek kullanım
 
 if __name__=="__main__":
 
     movies = read_file("movie_titles.csv", header=False)
-    txts, a = read_txt()
-    a = calculate_avg_ratings(txts)
-    print(type(txts))
-    print(a)
+    txts, b = read_txt()
+    a,b = calculate(txts)
+    # first_10 = dict(list(txts.items())[:1])
+    # length = {}
+    
+    # for i in txts:
+    #    values = txts[i]
+    #    ratings = [entry[2] for entry in values]
+    #    avg_rate = sum(ratings)/ len(ratings)
+
+    #    length[i] = {"avg_rate": avg_rate, "izlenme":len(values)}
+
+    #    if length[i]["avg_rate"]
+
+# sorted_length = dict(sorted(length.items(), key=lambda item: item[1]['avg_rate'], reverse=True))
+
+sorteds = sort_by_ratings(b)
+print(b[13433]["weighted_score"])
+
+
+
 
    
     # print(movies[17764].movie_name)
