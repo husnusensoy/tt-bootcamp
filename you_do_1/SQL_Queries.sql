@@ -41,16 +41,24 @@ CREATE TABLE IF NOT EXISTS normalized_rates AS(
 );
 
 -- cold start recommendation:
+
 -- izlenme sayısı düşük olan filmleri henüz eleyemedim ancak ilerlememi paylaşmak istedim.
 -- Bu sorunu çözdükten sonra diğer 2 maddedeki talepler için geliştirmeye devam edeceğim.
-SELECT a.Title, a.MovieId, MEDIAN(b.NormalizedRate) as NormalizedRateMEDIAN, COUNT(UserId) AS WatchCount
+SELECT a.Title, a.MovieId, AVG(b.NormalizedRate) AS NormalizedRateAVG, MEDIAN(b.NormalizedRate) AS NormalizedRateMEDIAN, COUNT(UserId) AS WatchCount
 FROM titles a 
 LEFT JOIN normalized_rates b
 USING(MovieId)
 GROUP BY a.Title, a.MovieId
 ORDER BY NormalizedRateMEDIAN DESC;
 
-
+-- normalize edilmiş film skorlarının güven aralığının alt sınırını hesaplayarak filmlerin ortalama skorlarını izlenme sayısına göre cezalandırdım.
+SELECT a.Title, a.MovieId, COUNT(UserId) AS WatchCount, AVG(b.NormalizedRate) AS NormalizedRateAVG, AVG(b.NormalizedRate) -1.96 * (STDDEV(NormalizedRate) / SQRT(COUNT(UserId))) AS AdjustedScore
+FROM titles a 
+LEFT JOIN normalized_rates b
+USING(MovieId)
+GROUP BY a.Title, a.MovieId
+ORDER BY AdjustedScore DESC
+LIMIT 30;
 
 
 
