@@ -2,7 +2,7 @@ from pathlib import Path
 from dataclasses import dataclass
 from typing import List, Dict, Tuple
 from collections import defaultdict
-
+import pandas as pd
 from pprint import pprint
 
 
@@ -23,6 +23,8 @@ class Ratings:
 def read_file(file_name: str | Path,header:bool, delimiter: str = ","):
     movie_dict: Dict[int, Movies] = {}
 
+    movie_list = []
+
         
     with Path(file_name).open() as rf:
         if header:
@@ -35,28 +37,23 @@ def read_file(file_name: str | Path,header:bool, delimiter: str = ","):
 
                     movie_name = ",".join(movie_name)
 
-                    movie = Movies(
-                        published_year=published_year,
-                        movie_name=str(movie_name)
-                    )
-
-                    movie_dict[int(movie_id)] = movie
         else:
             for i, line in enumerate(rf):
                 movie_id, published_year, *movie_name = line.strip().split(delimiter)
                 movie_name = ",".join(movie_name)  # *name de liste olarka geldi biz de bunun ,le birleştierek strgine çeviridk.
                             
-                movie = Movies(
-                    # movie_id = int(movie_id),
-                    published_year=published_year,
-                    movie_name=movie_name
-                )
+             
 
-                movie_dict[int(movie_id)] = movie
+                movie_2 = [int(movie_id), published_year, movie_name ]
+
+                movie_list.append(movie_2)
 
 
 
-    return movie_dict
+
+
+    return movie_list
+
 file_paths =["D:/indirilenler/binge/rating_1.txt","D:/indirilenler/binge/rating_2.txt","D:/indirilenler/binge/rating_3.txt","D:/indirilenler/binge/rating_4.txt"]
 
 def read_txt():
@@ -125,24 +122,29 @@ def sort_by_ratings(weighted_scores):
 if __name__=="__main__":
 
     movies = read_file("movie_titles.csv", header=False)
-    txts, b = read_txt()
-    a,b = calculate(txts)
-    # first_10 = dict(list(txts.items())[:1])
-    # length = {}
+# CSV olarak kaydet
+    df = pd.DataFrame(movies, columns=["movie_id", "published_year", "movie_name"])
+    df.to_csv("cleaned_movie_titles.csv", index=False, encoding="utf-8")
+
+    print("Dosya başarıyla kaydedildi: cleaned_movie_titles.csv")
+#     txts, b = read_txt()
+#     a,b = calculate(txts)
+#     # first_10 = dict(list(txts.items())[:1])
+#     # length = {}
     
-    # for i in txts:
-    #    values = txts[i]
-    #    ratings = [entry[2] for entry in values]
-    #    avg_rate = sum(ratings)/ len(ratings)
+#     # for i in txts:
+#     #    values = txts[i]
+#     #    ratings = [entry[2] for entry in values]
+#     #    avg_rate = sum(ratings)/ len(ratings)
 
-    #    length[i] = {"avg_rate": avg_rate, "izlenme":len(values)}
+#     #    length[i] = {"avg_rate": avg_rate, "izlenme":len(values)}
 
-    #    if length[i]["avg_rate"]
+#     #    if length[i]["avg_rate"]
 
-# sorted_length = dict(sorted(length.items(), key=lambda item: item[1]['avg_rate'], reverse=True))
+# # sorted_length = dict(sorted(length.items(), key=lambda item: item[1]['avg_rate'], reverse=True))
 
-sorteds = sort_by_ratings(b)
-print(b[13433]["weighted_score"])
+# sorteds = sort_by_ratings(b)
+# print(b[13433]["weighted_score"])
 
 
 
