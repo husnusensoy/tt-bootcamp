@@ -2,3 +2,13 @@ data/
 uv.lock
 mapred/dfs
 __pycache__/
+.vscode
+.ipynb_checkpoints
+
+# data items
+*.jsonl.gz
+*.tar.gz
+*.zip
+*.csv
+*.duck
+*.db
