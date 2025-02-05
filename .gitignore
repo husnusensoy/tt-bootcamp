@@ -2,10 +2,13 @@ data/
 uv.lock
 mapred/dfs
 __pycache__/
-you_do_1/dataset/raw/binge/rating_1.csv
-you_do_1/hedefler
-you_do_1/dataset/raw/binge/movie_titles.csv
-you_do_1/dataset/raw/binge/rating_2.csv
-you_do_1/dataset/raw/binge/rating_3.csv
-you_do_1/dataset/raw/binge/rating_4.csv
-you_do_1/models/als_recommender_model.npz
+.vscode
+.ipynb_checkpoints
+
+# data items
+*.jsonl.gz
+*.tar.gz
+*.zip
+*.csv
+*.duck
+*.db
