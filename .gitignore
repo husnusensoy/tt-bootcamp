@@ -2,3 +2,4 @@ data/
 uv.lock
 mapred/dfs
 __pycache__/
+*.db
