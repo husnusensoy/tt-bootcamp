@@ -2,3 +2,5 @@ data/
 uv.lock
 mapred/dfs
 __pycache__/
+movies.db
+cleaned_movie_titles.csv
