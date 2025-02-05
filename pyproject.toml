@@ -10,6 +10,7 @@ dependencies = [
     "ipython>=8.31.0",
     "mypy>=1.14.1",
     "pandas>=2.2.3",
+    "polars>=1.21.0",
     "ruff>=0.9.3",
     "tqdm>=4.67.1",
     "types-tqdm>=4.67.0.20241221",
