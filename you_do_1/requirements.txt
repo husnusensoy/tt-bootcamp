@@ -1,0 +1,6 @@
+numpy
+scipy
+pandas
+annoy
+scikit-learn
+loguru
