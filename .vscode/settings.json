@@ -1,0 +1,11 @@
+{
+    "sqltools.useNodeRuntime": true,
+    "sqltools.connections": [
+        {
+            "previewLimit": 50,
+            "driver": "SQLite",
+            "database": "${workspaceFolder:tt-bootcamp}/you_do_1/data/new_db.db",
+            "name": "connection 1"
+        }
+    ]
+}
