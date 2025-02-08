@@ -18,21 +18,23 @@ Veri Görselleştirme: Pazarlama ekibine yönelik çeşitli analizler ve grafikl
 
 ### Kullandığım Kütüphaneler
 
-*pandas
-*numpy
-*sklearn
-*seaborn
-*matplotlib
-*xgboost
-*imblearn.over_sampling 
+- pandas
+- numpy
+- sklearn
+- seaborn
+- matplotlib
+- xgboost
+- imblearn.over_sampling 
 
 
 ### My Scores
 
-AUC: 0.7306
-Precision: 0.0270
-Recall: 0.5932
-F1-score: 0.0516
-Confussion Matrix:
+- AUC: 0.7306
+- Precision: 0.0270
+- Recall: 0.5932
+- F1-score: 0.0516
+  
+- Confussion Matrix:
+
 array([[622088, 236009],
        [  4491,   6548]])
