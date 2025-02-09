@@ -1,6 +1,8 @@
+"""
 !pip install scipy
 !pip install scikit-learn
 !pip install duckdb --upgrade
+"""
 
 # Import dependencies
 from pathlib import Path
@@ -9,6 +11,7 @@ import duckdb
 import pandas as pd
 from scipy import stats
 from sklearn.feature_extraction.text import CountVectorizer
+
 
 def load_ratings(rating_paths):
     if isinstance(rating_paths, str):
@@ -87,9 +90,11 @@ def merge_data(ratings, movies, rating_distribution):
     merged_ratings = duckdb.query(query).df()
     return merged_ratings
 
+
 def is_normal_distributed(serie):
     result = stats.anderson(serie, "norm")
     return result.statistic < result.critical_values[2]
+
 
 def get_correlation(serie1, serie2):
     normality = is_normal_distributed(serie1) and is_normal_distributed(serie2)
@@ -116,10 +121,12 @@ def get_liked_movie_names(ratings, movies, user_id):
     ].tolist()
     return liked_movie_names, user_ratings["movie_id"].tolist()
 
+
 def get_bow_df(names):
     if not names:
-        return pdDataFrame()
-    Vectorizer = CountVectorizer(stop_words="english", token_pattern=r"\b\w {2,} \ b")
+        return pd.DataFrame()
+
+    vectorizer = CountVectorizer(stop_words="english", token_pattern=r"\b\w {2,} \ b")
     bow = vectorizer.fit_transform(pd.Series(names))
 
     return pd.DataFrame(bow.toarray(), columns=vectorizer.get_feature_names_out())
@@ -154,7 +161,7 @@ def get_user_recommendations(ratings, movies, rating_distribution, user_id, size
         lambda x: any(word in x.lower() for word in top_words)
     )
 
-    matching_movies = unrated_movies[unrated_movies["has_match"] == True]
+    matching_movies = unrated_movies[unrated_movies["has_match"]]
 
     matching_movies_with_ratings = matching_movies.merge(
         rating_distribution[["weighted_rating"]],
@@ -168,6 +175,7 @@ def get_user_recommendations(ratings, movies, rating_distribution, user_id, size
         .head(size)
         .drop("weighted_rating", axis=1)
     )
+
 
 movies_path = "/Users/zeynepsari/Projects/binge/movie_titles.csv"
 rating_paths = [
@@ -191,7 +199,7 @@ print(movies.head())
 print(ratings.head())
 
 
-def get_cold_start_recommendations(movies, rating_distribution, size=15):
+def get_cold_start_recommendations_2(movies, rating_distribution, size=15):
     sorted_movies = rating_distribution.sort_values(
         by="weighted_rating", ascending=False
     )
@@ -199,7 +207,7 @@ def get_cold_start_recommendations(movies, rating_distribution, size=15):
     return movies[movies["movie_id"].isin(cold_start_movie_ids)].reset_index(drop=True)
 
 
-def compute_weighted_ratings(ratings):
+def compute_weighted_ratings_2(ratings):
     rating_distribution = (
         ratings.groupby("movie_id")["rating"]
         .value_counts(normalize=True)
@@ -209,6 +217,7 @@ def compute_weighted_ratings(ratings):
         rating_distribution * rating_distribution.columns
     ).sum(axis=1)
     return rating_distribution.reset_index()
+
 
 rating_distribution = compute_weighted_ratings(ratings)
 cold_start_recommendations = get_cold_start_recommendations(
@@ -231,4 +240,4 @@ rating_paths = [
 ]
 movies_path = "/Users/zeynepsari/Projects/binge/movie_titles.csv"
 
-!ls /Users/zeynepsari/Projects/binge/
+# !ls /Users/zeynepsari/Projects/binge/
