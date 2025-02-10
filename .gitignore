@@ -4,6 +4,7 @@ mapred/dfs
 __pycache__/
 .vscode
 .ipynb_checkpoints
+.DS_Store
 
 # data items
 *.jsonl.gz
