@@ -24,9 +24,8 @@ class Probability:
         - Laplace smoothing
         """
         self.freq = {}
-        self.cardinality_vocabulary = N
         self.alpha = alpha
-        self.N = 0
+        self.N = N
         self.total_term_freq = 0
 
     def add(self, w: str, count: int = 1):
