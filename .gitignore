@@ -5,6 +5,7 @@ __pycache__/
 .vscode
 .ipynb_checkpoints
 .DS_Store
+.idea
 
 # data items
 *.jsonl.gz
