@@ -1,0 +1,7 @@
+Test Metrics
+AUC: 0.7129
+Accuracy: 0.5857
+Precision: 0.0308
+Recall: 0.6949
+Balanced Accuracy: 0.6393
+F1 Score: 0.0590
