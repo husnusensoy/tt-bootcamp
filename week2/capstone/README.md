@@ -1,60 +1,60 @@
-# Capstone: Guardians of Churn
+# Customer Churn Prediction
 
-Bu capstone görevinde hedefimiz olası müşteri göçlerinin önüne geçmek. Farklı servislerimize ait müşteri verileri sizlerle paylaşıldı. 
+This repository contains a machine learning pipeline for predicting customer churn. The project includes data loading, exploratory data analysis (EDA), preprocessing, feature engineering, model training, evaluation, and hyperparameter tuning using LightGBM and other boosting algorithms.
 
-Call center ekibimiz aramalar için pazarlama ekibimiz ise karşı teklifler vermek için hazır ama onlara sıralı bir liste iletmemiz var. Soru basit kimler bizden ayrılmayı düşünüyor ?
+## Project Structure
 
-Aksiyon öncesinde yönetim ekibimizi ikna edecek somut bir sunum yapacaksınız. 5 dk süreniz var.
+- **Data Loading**:  
+  Reads data from CSV files (`data/train.csv` and `data/new_test.csv`).
 
-Kolaylıklar,
+- **Exploratory Data Analysis (EDA)**:  
+  Performs initial data inspection by checking for missing values and visualizing distributions (e.g., histograms based on churn status).
 
-Hüsnü 
+- **Preprocessing & Feature Engineering**:  
+  - Fills missing values and handles edge cases (e.g., when call duration is missing).  
+  - Applies feature extraction (e.g., calculating ratios such as `overdue_payment_ratio`, `lifetime_value`, and `call_drop_ratio`).  
+  - Encodes categorical variables using MultiLabelBinarizer and OneHotEncoder.  
 
-## Veri Kaynağı
+- **Handling Class Imbalance**:  
+  Implements undersampling (with a majority multiplier of 5) and includes a function for oversampling using SMOTE.
 
-Toplamda 10 milyon müşterimize ait veri sizlerlerle 10 parça halinde paylaşıldı
+- **Model Training and Evaluation**:  
+  - Uses LightGBM as the main classifier.  
+  - Performs cross-validation using StratifiedKFold (with 5 folds) to evaluate model performance on undersampled data.  
+  - Evaluates performance using Accuracy, Precision, Recall, F1 Score, ROC AUC, and a confusion matrix.  
 
-```
-https://storage.googleapis.com/sadedegel/dataset/tt-capstone/capstone.1.jsonl.gz
-https://storage.googleapis.com/sadedegel/dataset/tt-capstone/capstone.2.jsonl.gz
-https://storage.googleapis.com/sadedegel/dataset/tt-capstone/capstone.3.jsonl.gz
-https://storage.googleapis.com/sadedegel/dataset/tt-capstone/capstone.4.jsonl.gz
-https://storage.googleapis.com/sadedegel/dataset/tt-capstone/capstone.5.jsonl.gz
-https://storage.googleapis.com/sadedegel/dataset/tt-capstone/capstone.6.jsonl.gz
-https://storage.googleapis.com/sadedegel/dataset/tt-capstone/capstone.7.jsonl.gz
-https://storage.googleapis.com/sadedegel/dataset/tt-capstone/capstone.8.jsonl.gz
-https://storage.googleapis.com/sadedegel/dataset/tt-capstone/capstone.9.jsonl.gz
-https://storage.googleapis.com/sadedegel/dataset/tt-capstone/capstone.10.jsonl.gz
-```
+- **Hyperparameter Tuning**:  
+  Uses Optuna to tune LightGBM hyperparameters by maximizing the average F1 score across folds.
 
-## Yapılacaklar
+- **Feature Importance**:  
+  Visualizes feature importances with a horizontal bar chart.
 
-* Metriğinizi iyi belirleyin. (Unutmayın ki her ay sadece abone kitlesinden 1000'de birlik kısmı kaybediyoruz.)
+## Dependencies
 
-* Modellemenizi gerçekleştirin. Tercihen yorumlaması ve açıklaması kolay olan bir model olsun. Regülasyon sağlayan kurum açıklanması zor modellerde bizi zorlayacaktır.
+Ensure you have Python 3.x installed along with the following libraries:
 
-* Yapacağınız sunumda iş birimimiz olacak. En basit bir şekilde onlara çözümümüzü aktarmamız gerekiyor.
+- numpy
+- pandas
+- scikit-learn
+- matplotlib
+- seaborn
+- lightgbm
+- catboost
+- xgboost
+- optuna
+- imbalanced-learn
 
-## Veri Alanları
+You can install the required packages using pip:
 
-* **id**: Müşteri IDsi
-* **age**: Müşterinin yaşı
-* **tenure**: Müşterinin operatörde geçirdiği toplam süre (ay cinsinden)
-* **service_type**: Ön Ödemeli, Peşin Ödemeli veya Geniş Bant internet müşterisi
-* **avg_call_duration**: Ortalama sesli görüşme süresi (saniye)
-* **data_usage**: GB Upload + Download
-* **roaming_usage**: Ortalama roaming sesli görüşme süresi
-* **monthly_charge**: Aylık ortalama fatura
-* **overdue_payments**: Ödemesi geçen fatura adedi
-* **auto_payment**: Otomatik ödeme talimatı
-* **avg_top_up_count**: Ön yüklemeli abone için aylık yükleme sayısı ortalaması
-* **call_drops**: Şebekede yaşadığı sesli görüşme kesilmesi
-* **customer_support_calls**: Toplam çağrı merkezi araması
-* **satisfaction_score**: Müşteri çağrı merkezi değerlendirme skoru 
-* **apps**: Müşterinin kullandığı diğer servislerimiz
-    * İzleGo 
-    * RitimGo
-    * CüzdanX
-    * HızlıPazar
-    * Konuşalım
-* **churn**: bool
+```bash
+pip install numpy pandas scikit-learn matplotlib seaborn lightgbm catboost xgboost optuna imbalanced-learn
+
+My score on each metric:
+Accuracy: 0.9752305
+Precision: 0.09028526262844004
+Recall: 0.09401069918820845
+F1 Score: 0.09211032713277742
+auc: 0.7988360693082897
+Confussion matrix:
+[[1947948   25321]
+[  24218    2513]]
