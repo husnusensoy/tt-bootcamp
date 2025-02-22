@@ -1,20 +1,16 @@
-# JePytohn for Data Science
+# JePytohn for Data Science
 
 
-## Environment Management
+## Environment Management
 
-* conda
-* mamba
-* pip
-* pipx
-* poetry
-* uv
+Use [uv](https://github.com/astral-sh/uv) for environment management
 
+## Code Formatting
 
-## Code Formatting
-
-* black
-* ruff
+To format and fix PEP8 errors use.
+```
+make fix
+```
 
 
 ## Static code analysis
