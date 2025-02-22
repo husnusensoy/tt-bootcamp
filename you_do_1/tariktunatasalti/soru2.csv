@@ -1,0 +1,31 @@
+recommended_movie,recommended_weighted_score,recommended_bayesian_score,recommended_watch_count,avg_rating
+Finding Nemo (Widescreen),175.0,4.08,40,4.38
+The Shawshank Redemption: Special Edition,169.0,4.25,36,4.69
+The Green Mile,169.0,4.18,37,4.57
+Shrek 2,163.0,3.95,39,4.18
+The Rock,162.0,3.88,40,4.05
+Gladiator,160.0,3.97,38,4.21
+Shrek (Full-screen),155.0,4.02,36,4.31
+Unknown Movie,154.0,4.0,36,4.28
+Lord of the Rings: The Two Towers,154.0,4.21,33,4.67
+Indiana Jones and the Last Crusade,152.0,4.1,34,4.47
+Braveheart,151.0,4.09,34,4.44
+The Silence of the Lambs,149.0,4.05,34,4.38
+The Bourne Identity,148.0,3.84,37,4.0
+Lord of the Rings: The Fellowship of the Ring,146.0,4.14,32,4.56
+Raiders of the Lost Ark,145.0,4.05,33,4.39
+Lord of the Rings: The Return of the King,145.0,4.2,31,4.68
+The Fugitive,143.0,3.95,34,4.21
+Pretty Woman,143.0,3.7,38,3.76
+The Matrix,143.0,4.02,33,4.33
+Saving Private Ryan,139.0,4.09,31,4.48
+Spider-Man 2,138.0,3.93,33,4.18
+Spider-Man,135.0,3.88,33,4.09
+Erin Brockovich,133.0,3.78,34,3.91
+Die Hard,132.0,3.9,32,4.13
+Unknown Movie,131.0,3.69,35,3.74
+Catch Me If You Can,131.0,3.88,32,4.09
+Air Force One,130.0,3.67,35,3.71
+Rain Man,130.0,3.86,32,4.06
+Ghostbusters,130.0,3.73,34,3.82
+The Matrix: Reloaded,129.0,3.78,33,3.91
