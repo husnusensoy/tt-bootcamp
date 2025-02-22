@@ -1,7 +1,7 @@
-from typing import Tuple, Any, Dict, Union, List
-from pathlib import Path
 import json
 from dataclasses import dataclass
+from pathlib import Path
+from typing import Dict, List, Tuple, Union
 
 
 @dataclass
@@ -38,30 +38,30 @@ class ProfileDB:
 
         return Profile(**e)
 
-    def count_profile_by_job(self, job:  List[str]) -> int:
+    def count_profile_by_job(self, job: List[str]) -> int:
         return sum([1 for p in self.db.values() if p["job"] in job])
 
     def count_profile_by_field(self, field: Tuple[str]) -> Dict[Tuple, int]:
         result = {}
-        
+
         for p in self.db.values():
             group = tuple([p[f] for f in field])
-            
-            result[group] = result.get(group,0) + 1
-            
+
+            result[group] = result.get(group, 0) + 1
+
         return result
 
-    def listagg_profile_by_field(self, field: Tuple[str]) -> Dict[Tuple, List[int]]:
+    def listagg_profile_by_field(self, field: Tuple[str]) -> Dict[Tuple, List[int]]:  # noqa: E501
         result = {}
-        
+
         for p in self.db.values():
             group = tuple([p[f] for f in field])
-            
+
             if group not in result:
                 result[group] = []
-                
-            result[group].append(int(p['ssn']))
-                        
+
+            result[group].append(int(p["ssn"]))
+
         return result
 
     def count_profile(self):
@@ -93,17 +93,24 @@ def test_count_profile():
 def test_count_profile_by_job():
     db = ProfileDB()
 
-    assert db.count_profile_by_job(["İnşaat mühendisi", "İnşaatçı"]) == 138 + 134
+    assert db.count_profile_by_job(["İnşaat mühendisi", "İnşaatçı"]) == 272
+
 
 def test_count_profile_by_field():
     db = ProfileDB()
 
-    assert db.count_profile_by_field(("blood_group", )) == None #{("B-","M"): 10,("B-","F"): 10}
+    assert (
+        db.count_profile_by_field(("blood_group",)) is None
+    )  # {("B-","M"): 10,("B-","F"): 10}
 
-def test_count_profile_by_field():
+
+def test_listagg_profile_by_field():
     db = ProfileDB()
 
-    assert db.listagg_profile_by_field(("sex","company" )) == None #{("B-","M"): 10,("B-","F"): 10}
+    assert (
+        db.listagg_profile_by_field(("sex", "company")) is None
+    )  # {("B-","M"): 10,("B-","F"): 10}
+
 
 # def test_count_profile():
 #     db = ProfileDB()

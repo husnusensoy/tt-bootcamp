@@ -1,5 +1,5 @@
-from typing import List, Callable
 from math import fabs
+from typing import Callable, List
 
 y_true = [1, 2, 3, 4, 5, 6, 7, 8, 0]
 y_pred = [1, 2, 4, 5, 6, 9, 8, 3, 0]
@@ -23,7 +23,9 @@ def super_metric(
     y_true: List[int],
     y_pred: List[int],
 ) -> float:
-    return sum([fn(y_true, y_pred) * w for fn, w in zip(fns, weights)]) / sum(weights)
+    total = sum(weights)
+
+    return sum([fn(y_true, y_pred) * w for fn, w in zip(fns, weights)]) / total
 
 
 scoring = {"mae": mae, "mean_absolute_error": mae, "mse": mse, "iou": iou}

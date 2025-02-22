@@ -8,8 +8,11 @@ Welcome to **TT Bootcamp** – a hands-on, intensive learning experience designe
 
 ## 📌 Features
 ✅ Hands-on projects & exercises (**IDo, WeDo, and YouDo**)
+
 ✅ Covers **Python, Databases, Machine Learning and AI**  
+
 ✅ Practical, real-world scenarios  
+
 ✅ Open-source & collaborative  
 
 ## 📂 Repository Structure
