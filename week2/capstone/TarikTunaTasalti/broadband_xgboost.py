@@ -30,7 +30,7 @@ output_dir = "broadband_results"
 os.makedirs(output_dir, exist_ok=True)
 
 # Veri yükle
-df = pd.read_parquet("../../../tt_data/processed/Broadband.parquet")
+df = pd.read_parquet("../../../../tt_data/processed/Broadband.parquet")
 df = df.drop(columns=["id"], errors='ignore')
 
 # Özellik (X) ve hedef (y)
@@ -206,6 +206,26 @@ plt.ylabel('Density')
 # 5) Kaydet
 comparison_path = os.path.join(output_dir, 'broadband_test_threshold_comparison.png')
 plt.savefig(comparison_path, dpi=300, bbox_inches='tight')
+plt.close()
+
+# ROC Curve ve AUC Plot
+fpr, tpr, _ = roc_curve(y_test, test_proba)
+auc_score = roc_auc_score(y_test, test_proba)
+
+plt.figure(figsize=(6, 6))
+plt.plot(fpr, tpr, color='blue', lw=2)
+plt.fill_between(fpr, tpr, color='lightblue', alpha=0.5)
+plt.xlabel("FPR")
+plt.ylabel("TPR")
+plt.title("ROC Curve")
+plt.text(0.5, 0.5, f"AUC = {auc_score:.3f}", fontsize=12, bbox=dict(facecolor='white', alpha=0.8))
+plt.xlim([0, 1])
+plt.ylim([0, 1])
+plt.grid(True)
+
+# PNG olarak kaydetme
+auc_plot_path = os.path.join(output_dir, "auc_curve.png")
+plt.savefig(auc_plot_path, dpi=300, bbox_inches='tight')
 plt.close()
 
 # -- Metrikleri TXT dosyasına kaydetme ---
