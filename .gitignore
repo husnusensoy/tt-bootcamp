@@ -4,3 +4,5 @@ mapred/dfs
 __pycache__/
 .DS_Store
 .tmp/
+.DS_Store
+you_do_1/.DS_Store
