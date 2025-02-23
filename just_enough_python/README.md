@@ -1,4 +1,4 @@
-# JePytohn for Data Science
+# JePython for Data Science
 
 
 ## Environment Management
